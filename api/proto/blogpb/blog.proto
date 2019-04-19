@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package blog;
+
+
+option go_package = "blogpb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+// Google.Protobuf.WellKnownTypes.Timestamp
+message Blog {
+    string id = 1;
+    string authorId = 2;
+    string email = 3;
+    string title = 4;
+    string content = 5;
+    google.protobuf.Timestamp Created = 6;
+    google.protobuf.Timestamp Modified = 7;
+}
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "Blog service";
+		version: "1.0";
+		contact: {
+			name: "Blogging Service";
+			url: "https://github.com/skckadiyala/grpc-rest-service";
+			email: "skc@gmail.com";
+        };
+    };
+    schemes: [ HTTP, HTTPS ];
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+		key: "404";
+		value: {
+			description: "Returned when the resource does not exist.";
+			schema: {
+				json_schema: {
+					type: STRING;
+				}
+			}
+		}
+	}
+};
+
+
+message CreateBlogRequest{
+    Blog blog =1;
+}
+
+message CreateBlogResponse{
+    Blog blog = 1;
+}
+
+message ReadBlogRequest{
+    string id = 1;
+}
+
+message ReadBlogResponse{
+    Blog blog = 1;
+}
+
+message UpdateBlogRequest{
+    Blog blog = 1;
+}
+message UpdateBlogResponse{
+    Blog blog = 1;
+}
+
+message DeleteBlogRequest{
+    string id = 1;
+}
+message DeleteBlogResponse{
+    string id = 1;
+}
+// message ListBlogRequest {
+
+// }
+// message ListBlogResponse {
+//     Blog blog = 1;
+// }
+service BlogService{
+
+    rpc CreateBlog(CreateBlogRequest) returns (CreateBlogResponse){
+        option (google.api.http) = {
+            post: "/v1/blog"
+            body: "*"
+        };
+    }
+
+    rpc ReadBlog(ReadBlogRequest) returns (ReadBlogResponse){
+        option (google.api.http) = {
+            get: "/v1/blog/{id}"
+        };
+    } 
+
+    rpc UpdateBlog(UpdateBlogRequest) returns (UpdateBlogResponse){
+        option (google.api.http) = {
+            put: "/v1/blog/{blog.id}"
+
+            additional_bindings {
+                patch: "/v1/blog/{blog.id}"
+                body: "*"
+            }
+        };
+    } 
+    rpc DeleteBlog(DeleteBlogRequest) returns (DeleteBlogResponse){
+        option (google.api.http) = {
+            delete: "/v1/blog/{id}"
+        };
+    }
+    
+    // rpc ListBlog(ListBlogRequest) returns (ListBlogResponse){
+    //     option (google.api.http) = {
+    //         get: "/v1/blog/list"
+    //     };
+    // }
+}
