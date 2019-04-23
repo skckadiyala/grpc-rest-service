@@ -1,6 +1,7 @@
 FROM ubuntu
 
 RUN mkdir -p /opt/blog/swagger-ui
+RUN mkdir -p /opt/blog/secure
 
 COPY blogserver /usr/local/bin/
 COPY start-service.sh /opt/blog/

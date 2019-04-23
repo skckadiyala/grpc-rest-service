@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,7 +15,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/skckadiyala/blog-svc/api/proto/blogpb"
-	"github.com/skckadiyala/blog-svc/insecure"
 	"github.com/skckadiyala/blog-svc/logger"
 	"github.com/skckadiyala/blog-svc/protocol/rest/middleware"
 	"go.uber.org/zap"
@@ -39,13 +40,27 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 	curdir, _ := os.Getwd()
 	fmt.Println("cur dir", curdir)
 
+	certPEM, err := ioutil.ReadFile("/opt/blog/secure/cert.pem")
+	if err != nil {
+		logger.Log.Fatal("failed to read cert pem file", zap.String("reason", err.Error()))
+	}
+	keyPEM, err := ioutil.ReadFile("/opt/blog/secure/key.pem")
+	if err != nil {
+		logger.Log.Fatal("failed to read key pem file", zap.String("reason", err.Error()))
+	}
+
+	Cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		log.Fatalln("Failed to parse key pair:", err)
+	}
+
 	srv := &http.Server{
 		Addr: ":" + httpPort,
 		// add handler with middleware
 		Handler: middleware.AddRequestID(
 			middleware.AddLogger(logger.Log, mux)), //mux
 		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{insecure.Cert},
+			Certificates: []tls.Certificate{Cert},
 		},
 	}
 
