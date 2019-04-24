@@ -1,0 +1,67 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "blog-svc.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "blog-svc.name" . }}
+    helm.sh/chart: {{ include "blog-svc.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      mode: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        mode: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: {{ .Values.image.command }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{ if eq .Values.service.targetPort "8443" }}
+          volumeMounts:
+            - name: blog-keypair
+              readOnly: true
+              mountPath: /opt/blog/secure
+{{ end }}
+          env:
+            - name: REST_PORT
+              value: "{{ .Values.service.targetPort }}"
+            - name: GRPC_PORT
+              value: "{{ .Values.env.grpc_port }}"
+            - name: MGODB_HOST
+              value: {{ .Values.env.mongo_host }}
+            - name: MGODB_USER
+              value: {{ .Values.env.mongo_user }}
+            - name: MGODB_PWD
+              value: {{ .Values.env.mongo_pwd }}
+            - name: MGODB_SCHEMA
+              value: {{ .Values.env.mongo_schema }}
+            - name: MGODB_COLLECTION
+              value: {{ .Values.env.mongo_collection }}
+{{ if eq .Values.service.targetPort "8443" }}
+      volumes:
+        - name: blog-keypair
+          secret:
+            secretName: blog-keypair
+{{ end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

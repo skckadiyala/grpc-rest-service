@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -33,6 +32,7 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 	if err := blogpb.RegisterBlogServiceHandlerFromEndpoint(ctx, gwmux, "localhost:"+grpcPort, opts); err != nil {
 		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}
+	var Cert tls.Certificate
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/apidoc/", serveSwagger)
@@ -40,18 +40,20 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 	curdir, _ := os.Getwd()
 	fmt.Println("cur dir", curdir)
 
-	certPEM, err := ioutil.ReadFile("/opt/blog/secure/cert.pem")
-	if err != nil {
-		logger.Log.Fatal("failed to read cert pem file", zap.String("reason", err.Error()))
-	}
-	keyPEM, err := ioutil.ReadFile("/opt/blog/secure/key.pem")
-	if err != nil {
-		logger.Log.Fatal("failed to read key pem file", zap.String("reason", err.Error()))
-	}
-
-	Cert, err := tls.X509KeyPair(certPEM, keyPEM)
-	if err != nil {
-		log.Fatalln("Failed to parse key pair:", err)
+	if httpPort == "8443" {
+		logger.Log.Info("getting certs REST/HTTP ssl server...")
+		certPEM, err := ioutil.ReadFile("/opt/blog/secure/cert.pem")
+		if err != nil {
+			logger.Log.Fatal("failed to read cert pem file", zap.String("reason", err.Error()))
+		}
+		keyPEM, err := ioutil.ReadFile("/opt/blog/secure/key.pem")
+		if err != nil {
+			logger.Log.Fatal("failed to read key pem file", zap.String("reason", err.Error()))
+		}
+		Cert, err = tls.X509KeyPair(certPEM, keyPEM)
+		if err != nil {
+			logger.Log.Fatal("failed to parse key pair:", zap.String("reason", err.Error()))
+		}
 	}
 
 	srv := &http.Server{
@@ -77,10 +79,12 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 		_ = srv.Shutdown(ctx)
 	}()
 
+	if httpPort == "8443" {
+		logger.Log.Info("starting HTTPS/REST gateway...")
+		return srv.ListenAndServeTLS("", "")
+	}
 	logger.Log.Info("starting HTTP/REST gateway...")
-	// return srv.ListenAndServe() // without TLS
-	return srv.ListenAndServeTLS("", "")
-
+	return srv.ListenAndServe() // without TLS
 }
 
 func serveSwagger(w http.ResponseWriter, r *http.Request) {

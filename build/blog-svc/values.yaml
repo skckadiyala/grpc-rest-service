@@ -1,0 +1,56 @@
+# Default values for blog-svc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: skckadiyala/blog-service
+  tag: 1.0.1
+  pullPolicy: Always
+  command: "['/bin/sh', '/opt/blog/start-service.sh']" 
+  # command: "['/bin/sh', '/opt/blog/start-ssl-service.sh']" 
+
+service:
+  type: LoadBalancer
+  port: 443
+  # to deploy service with ssl certs use 8443 port as targetPort
+  targetPort: "8443" 
+  # port: 80 # without TLS
+  # targetPort: "8080"
+
+secrets:
+  # provide base64 encoded certificate
+  cert: ""
+  # provide base64 encoded privatekey
+  key: ""
+
+env:
+  grpc_port: 9090
+  mongo_host: "mongodb.blogsvc:27017"
+  mongo_user: "ampc"
+  mongo_pwd: "changeme"
+  mongo_schema: "systest"
+  mongo_collection: "blog"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+affinity: {}
+
+nodeSelector:
+  backend-only: "true"
+tolerations:
+- key: "dedicated"
+  operator: "Equal"
+  value: "backend"
+  effect: "NoSchedule"
