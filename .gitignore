@@ -3,3 +3,4 @@ build/Dockerbuild
 build/*.yaml
 build/.DS_Store
 .DS_Store
+blogserver

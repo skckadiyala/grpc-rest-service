@@ -10,6 +10,7 @@ import (
 	"github.com/skckadiyala/blog-svc/logger"
 	"github.com/skckadiyala/blog-svc/pkg/service/blog"
 	"github.com/skckadiyala/blog-svc/protocol/grpc"
+	"github.com/skckadiyala/blog-svc/protocol/grpc/middleware"
 	"github.com/skckadiyala/blog-svc/protocol/rest"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -45,6 +46,9 @@ type Config struct {
 
 	MongoDBCollection string
 
+	// Auth Authorization for API Calls
+	Auth bool
+
 	// Log parameters section
 	// LogLevel is global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
 	LogLevel int
@@ -65,9 +69,13 @@ func main() {
 	flag.StringVar(&cfg.MongoDBPassword, "db-password", "", "Database password")
 	flag.StringVar(&cfg.MongoDBSchema, "db-schema", "systest", "Database schema")
 	flag.StringVar(&cfg.MongoDBCollection, "db-collection", "blog", "Database colletion")
+
+	flag.BoolVar(&cfg.Auth, "api-auth", false, "APIAuthentication")
+
 	flag.IntVar(&cfg.LogLevel, "log-level", 0, "Global log level")
 	flag.StringVar(&cfg.LogTimeFormat, "log-time-format", "2006-01-02T15:04:05.999999999Z07:00",
 		"Print time format for logger e.g. 2006-01-02T15:04:05Z07:00")
+
 	flag.Parse()
 
 	if len(cfg.GRPCPort) == 0 {
@@ -79,7 +87,9 @@ func main() {
 		fmt.Printf("invalid TCP port for HTTP gateway: '%s' \n", cfg.HTTPPort)
 		os.Exit(0)
 	}
-
+	if cfg.Auth {
+		middleware.APIAuth = true
+	}
 	// initialize logger
 	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
 		fmt.Printf("failed to initialize logger: %v \n", err)

@@ -1,14 +1,23 @@
 package middleware
 
 import (
+	"context"
+	"strings"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	"github.com/skckadiyala/blog-svc/auth"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
+
+var au auth.Authenticator
+
+var APIAuth bool
 
 // codeToLevel redirects OK to DEBUG level logging instead of INFO
 // This is example how you can log several gRPC code results
@@ -33,6 +42,7 @@ func AddLogging(logger *zap.Logger, opts []grpc.ServerOption) []grpc.ServerOptio
 	opts = append(opts, grpc_middleware.WithUnaryServerChain(
 		grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
 		grpc_zap.UnaryServerInterceptor(logger, o...),
+		grpc.UnaryServerInterceptor(unaryInterceptor),
 	))
 
 	// Add stream interceptor (added as an example here)
@@ -42,4 +52,28 @@ func AddLogging(logger *zap.Logger, opts []grpc.ServerOption) []grpc.ServerOptio
 	))
 
 	return opts
+}
+
+// unaryInterceptor call Auth with current context
+func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	if APIAuth {
+		auth, err := auth.ExtractHeader(ctx, "authorization")
+		if err != nil {
+			return ctx, err
+		}
+		if strings.HasPrefix(auth, "Basic ") {
+			_, err = au.BasicAuth(ctx)
+			if err != nil {
+				return nil, err
+			}
+		} else if strings.HasPrefix(auth, "Apikey ") {
+			_, err = au.APIKeyAuth(ctx)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return ctx, status.Error(codes.Unauthenticated, `missing value for "Authorization" header`)
+		}
+	}
+	return handler(ctx, req)
 }

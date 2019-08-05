@@ -37,6 +37,8 @@ spec:
               value: "{{ .Values.service.targetPort }}"
             - name: GRPC_PORT
               value: "{{ .Values.env.grpc_port }}"
+            - name: API_AUTH
+              value: {{ .Values.env.api_auth }}
             - name: MGODB_HOST
               value: {{ .Values.env.mongo_host }}
             - name: MGODB_USER

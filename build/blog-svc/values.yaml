@@ -32,6 +32,7 @@ env:
   mongo_pwd: "changeme"
   mongo_schema: "systest"
   mongo_collection: "blog"
+  api_auth: false
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

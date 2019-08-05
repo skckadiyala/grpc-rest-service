@@ -1,7 +1,7 @@
 # Log into Bintray's public registry prior to using this Makefile
 # docker login -u <user_login> -p <API_KEY> 
 
-DOCKERREPO       := skckadiyala/blog-service:1.0.1
+DOCKERREPO       := skckadiyala/blog-service:1.0.3
 
 all: blogservice container push
 
