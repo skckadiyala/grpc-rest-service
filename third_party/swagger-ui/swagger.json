@@ -10,6 +10,7 @@
     }
   },
   "schemes": [
+    "http",
     "https"
   ],
    "host": "blog-svc.apicsystest.axwaytest.net",
