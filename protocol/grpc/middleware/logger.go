@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var au auth.Authenticator
@@ -70,9 +71,9 @@ func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServ
 			if err != nil {
 				return nil, err
 			}
+		} else {
+			return ctx, status.Error(codes.Unauthenticated, `missing value for "Authorization" header`)
 		}
-		return handler(ctx, req)
 	}
-
 	return handler(ctx, req)
 }
