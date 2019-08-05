@@ -13,6 +13,8 @@
     "http",
     "https"
   ],
+   "host": "blog-svc.apicsystest.axwaytest.net",
+   "basePath": "/",
   "consumes": [
     "application/json"
   ],

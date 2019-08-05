@@ -1,259 +1,261 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Blog service",
-    "version": "1.0",
-    "contact": {
-      "name": "Blogging Service",
-      "url": "https://github.com/skckadiyala/grpc-rest-service",
-      "email": "skc@gmail.com"
-    }
+     "title": "Blog service",
+     "version": "1.0",
+     "contact": {
+        "name": "Blogging Service",
+        "url": "https://github.com/skckadiyala/grpc-rest-service",
+        "email": "skc@gmail.com"
+     }
   },
   "schemes": [
-    "http",
-    "https"
+     "http",
+     "https"
   ],
+  "host": "blog-svc.apicsystest.axwaytest.net",
+  "basePath": "/",
   "consumes": [
-    "application/json"
+     "application/json"
   ],
   "produces": [
-    "application/json"
+     "application/json"
   ],
   "paths": {
-    "/v1/blog": {
-      "post": {
-        "operationId": "CreateBlog",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/blogCreateBlogResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
+     "/v1/blog": {
+        "post": {
+           "operationId": "CreateBlog",
+           "responses": {
+              "200": {
+                 "description": "A successful response.",
+                 "schema": {
+                    "$ref": "#/definitions/blogCreateBlogResponse"
+                 }
+              },
+              "404": {
+                 "description": "Returned when the resource does not exist.",
+                 "schema": {
+                    "format": "string"
+                 }
+              }
+           },
+           "parameters": [
+              {
+                 "name": "body",
+                 "in": "body",
+                 "required": true,
+                 "schema": {
+                    "$ref": "#/definitions/blogCreateBlogRequest"
+                 }
+              }
+           ],
+           "tags": [
+              "BlogService"
+           ]
+        }
+     },
+     "/v1/blog/{blog.id}": {
+        "put": {
+           "operationId": "UpdateBlog",
+           "responses": {
+              "200": {
+                 "description": "A successful response.",
+                 "schema": {
+                    "$ref": "#/definitions/blogUpdateBlogResponse"
+                 }
+              },
+              "404": {
+                 "description": "Returned when the resource does not exist.",
+                 "schema": {
+                    "format": "string"
+                 }
+              }
+           },
+           "parameters": [
+              {
+                 "name": "blog.id",
+                 "in": "path",
+                 "required": true,
+                 "type": "string"
+              }
+           ],
+           "tags": [
+              "BlogService"
+           ]
         },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/blogCreateBlogRequest"
-            }
-          }
-        ],
-        "tags": [
-          "BlogService"
-        ]
-      }
-    },
-    "/v1/blog/{blog.id}": {
-      "put": {
-        "operationId": "UpdateBlog",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/blogUpdateBlogResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
+        "patch": {
+           "operationId": "UpdateBlog2",
+           "responses": {
+              "200": {
+                 "description": "A successful response.",
+                 "schema": {
+                    "$ref": "#/definitions/blogUpdateBlogResponse"
+                 }
+              },
+              "404": {
+                 "description": "Returned when the resource does not exist.",
+                 "schema": {
+                    "format": "string"
+                 }
+              }
+           },
+           "parameters": [
+              {
+                 "name": "blog.id",
+                 "in": "path",
+                 "required": true,
+                 "type": "string"
+              },
+              {
+                 "name": "body",
+                 "in": "body",
+                 "required": true,
+                 "schema": {
+                    "$ref": "#/definitions/blogUpdateBlogRequest"
+                 }
+              }
+           ],
+           "tags": [
+              "BlogService"
+           ]
+        }
+     },
+     "/v1/blog/{id}": {
+        "get": {
+           "operationId": "ReadBlog",
+           "responses": {
+              "200": {
+                 "description": "A successful response.",
+                 "schema": {
+                    "$ref": "#/definitions/blogReadBlogResponse"
+                 }
+              },
+              "404": {
+                 "description": "Returned when the resource does not exist.",
+                 "schema": {
+                    "format": "string"
+                 }
+              }
+           },
+           "parameters": [
+              {
+                 "name": "id",
+                 "in": "path",
+                 "required": true,
+                 "type": "string"
+              }
+           ],
+           "tags": [
+              "BlogService"
+           ]
         },
-        "parameters": [
-          {
-            "name": "blog.id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "BlogService"
-        ]
-      },
-      "patch": {
-        "operationId": "UpdateBlog2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/blogUpdateBlogResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "blog.id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/blogUpdateBlogRequest"
-            }
-          }
-        ],
-        "tags": [
-          "BlogService"
-        ]
-      }
-    },
-    "/v1/blog/{id}": {
-      "get": {
-        "operationId": "ReadBlog",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/blogReadBlogResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "BlogService"
-        ]
-      },
-      "delete": {
-        "operationId": "DeleteBlog",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/blogDeleteBlogResponse"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "format": "string"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "BlogService"
-        ]
-      }
-    }
+        "delete": {
+           "operationId": "DeleteBlog",
+           "responses": {
+              "200": {
+                 "description": "A successful response.",
+                 "schema": {
+                    "$ref": "#/definitions/blogDeleteBlogResponse"
+                 }
+              },
+              "404": {
+                 "description": "Returned when the resource does not exist.",
+                 "schema": {
+                    "format": "string"
+                 }
+              }
+           },
+           "parameters": [
+              {
+                 "name": "id",
+                 "in": "path",
+                 "required": true,
+                 "type": "string"
+              }
+           ],
+           "tags": [
+              "BlogService"
+           ]
+        }
+     }
   },
   "definitions": {
-    "blogBlog": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
+     "blogBlog": {
+        "type": "object",
+        "properties": {
+           "id": {
+              "type": "string"
+           },
+           "authorId": {
+              "type": "string"
+           },
+           "email": {
+              "type": "string"
+           },
+           "title": {
+              "type": "string"
+           },
+           "content": {
+              "type": "string"
+           },
+           "Created": {
+              "type": "string",
+              "format": "date-time"
+           },
+           "Modified": {
+              "type": "string",
+              "format": "date-time"
+           }
         },
-        "authorId": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "content": {
-          "type": "string"
-        },
-        "Created": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Modified": {
-          "type": "string",
-          "format": "date-time"
+        "title": "Google.Protobuf.WellKnownTypes.Timestamp"
+     },
+     "blogCreateBlogRequest": {
+        "type": "object",
+        "properties": {
+           "blog": {
+              "$ref": "#/definitions/blogBlog"
+           }
         }
-      },
-      "title": "Google.Protobuf.WellKnownTypes.Timestamp"
-    },
-    "blogCreateBlogRequest": {
-      "type": "object",
-      "properties": {
-        "blog": {
-          "$ref": "#/definitions/blogBlog"
+     },
+     "blogCreateBlogResponse": {
+        "type": "object",
+        "properties": {
+           "blog": {
+              "$ref": "#/definitions/blogBlog"
+           }
         }
-      }
-    },
-    "blogCreateBlogResponse": {
-      "type": "object",
-      "properties": {
-        "blog": {
-          "$ref": "#/definitions/blogBlog"
+     },
+     "blogDeleteBlogResponse": {
+        "type": "object",
+        "properties": {
+           "id": {
+              "type": "string"
+           }
         }
-      }
-    },
-    "blogDeleteBlogResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
+     },
+     "blogReadBlogResponse": {
+        "type": "object",
+        "properties": {
+           "blog": {
+              "$ref": "#/definitions/blogBlog"
+           }
         }
-      }
-    },
-    "blogReadBlogResponse": {
-      "type": "object",
-      "properties": {
-        "blog": {
-          "$ref": "#/definitions/blogBlog"
+     },
+     "blogUpdateBlogRequest": {
+        "type": "object",
+        "properties": {
+           "blog": {
+              "$ref": "#/definitions/blogBlog"
+           }
         }
-      }
-    },
-    "blogUpdateBlogRequest": {
-      "type": "object",
-      "properties": {
-        "blog": {
-          "$ref": "#/definitions/blogBlog"
+     },
+     "blogUpdateBlogResponse": {
+        "type": "object",
+        "properties": {
+           "blog": {
+              "$ref": "#/definitions/blogBlog"
+           }
         }
-      }
-    },
-    "blogUpdateBlogResponse": {
-      "type": "object",
-      "properties": {
-        "blog": {
-          "$ref": "#/definitions/blogBlog"
-        }
-      }
-    }
+     }
   }
 }
